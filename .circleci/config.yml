@@ -46,7 +46,7 @@ jobs:
       - run: 
           name: build, tag and push image
           command: |
-            echo $DOCKER_PASSWORD | docker login -u networkingcat --password-stdin
+            echo $DOCKER_PASSWORD | docker login -u jacklawrencetui --password-stdin
             # build 
             docker build -t jacklawrencetui/app:${CIRCLE_WORKFLOW_ID:0:7} .
             # tag
