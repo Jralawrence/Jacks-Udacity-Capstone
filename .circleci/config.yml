@@ -152,11 +152,11 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-environment
-      - build-and-deploy-docker-image:
-          requires: [build-environment]
-    #   - create-cluster:
-    #       cluster-name: eks-cluster-jacklawrence
+      # - build-environment
+      # - build-and-deploy-docker-image:
+      #     requires: [build-environment]
+      - create-cluster:
+          cluster-name: eks-cluster-jacklawrence
     #   - deploy-app-eks:
     #       requires: [build-and-deploy-docker-image]
     #       cluster-name: eks-cluster-jacklawrence
