@@ -46,7 +46,7 @@ jobs:
             make lint
             
   
-  build/deploy-docker-image:
+  build-deploy-docker-image:
     machine: true
     
     working_directory: ~/capstone
@@ -178,12 +178,12 @@ workflows:
   default:
     jobs:
       - build-environment
-      - build/deploy-docker-image:
+      - build-deploy-docker-image:
           requires: [build-environment]
       - create-eks-cluster:
           cluster-name: eks-cluster-jacklawrence
       - deploy-app-eks:
-          requires: [build/deploy-docker-image]
+          requires: [build-deploy-docker-image]
           cluster-name: eks-cluster-jacklawrence
           aws-region: eu-central-1
           requires: [create-eks-cluster]
