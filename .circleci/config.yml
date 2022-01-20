@@ -5,19 +5,24 @@ orbs:
   kubernetes: circleci/kubernetes@0.4.0
 
 jobs:
+  
   build-environment:
     docker:
       - image: python:3.7.3-stretch
+    
     working_directory: ~/capstone
 
     steps:
+      
       - checkout
+      
       # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
+      
       - run:
           name: install dependencies
           command: |
@@ -28,21 +33,27 @@ jobs:
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
             chmod +x /bin/hadolint
             pip install pylint
+      
       - save_cache:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
+      
       - run:
           name: run lint
           command: |
             . venv/bin/activate
             make lint
             
-  build-and-deploy-docker-image:
+  
+  build/deploy-docker-image:
     machine: true
+    
     working_directory: ~/capstone
+    
     steps:
       - checkout
+      
       - run: 
           name: build, tag and push image
           command: |
@@ -54,7 +65,8 @@ jobs:
             # push
             docker push jacklawrencetui/app:latest
             
-  create-cluster:
+  
+  create-eks-cluster:
     executor: aws-eks/python3
     parameters:
       cluster-name:
@@ -63,6 +75,7 @@ jobs:
         type: string
         
     steps:
+      
       - run:
           name: Install the eksctl tool
           command: |
@@ -85,6 +98,7 @@ jobs:
           cluster-name: eks-cluster-jacklawrence
           aws-region: eu-central-1
 
+  
   deploy-app-eks:
     executor: aws-eks/python3
     parameters:
@@ -94,21 +108,28 @@ jobs:
         type: string
       aws-region:
         description: |
-          AWS region
+          Default AWS region for TUI
         type: string 
+    
     steps:
+      
       - checkout
+      
       - kubernetes/install
+      
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
           aws-region: eu-central-1
+      
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: "app-deployment.yml"          
           resource-name: deployment/app
+      
       - kubernetes/create-or-update-resource:
           resource-file-path: "app-service.yml"
+      
       - run:
           name: information
           command: |
@@ -118,14 +139,18 @@ jobs:
             kubectl get nodes
             kubectl get deployment
             kubectl get pods -o wide
-  delete-cluster:
+  
+  
+  delete-eks-cluster:
       executor: aws-eks/python3
       parameters:
         cluster-name:
           description: |
             Name of the EKS cluster
           type: string
+      
       steps:
+        
         - run:
             name: Install the eksctl tool
             command: |
@@ -152,15 +177,15 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-environment
-      # - build-and-deploy-docker-image:
+      - build-environment
+      # - build/deploy-docker-image:
       #     requires: [build-environment]
-      # - create-cluster:
+      # - create-eks-cluster:
       #     cluster-name: eks-cluster-jacklawrence
       # - deploy-app-eks:
-      #     # requires: [build-and-deploy-docker-image]
+      #     requires: [build-and-deploy-docker-image]
       #     cluster-name: eks-cluster-jacklawrence
       #     aws-region: eu-central-1
-    #       requires: [create-cluster]
-      - delete-cluster:
-          cluster-name: eks-cluster-jacklawrence
+      #     requires: [create-cluster]
+      # - delete-eks-cluster:
+      #     cluster-name: eks-cluster-jacklawrence
