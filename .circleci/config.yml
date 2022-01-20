@@ -124,11 +124,11 @@ jobs:
       
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
-          resource-file-path: "app-deployment.yml"          
+          resource-file-path: "jack-app-deployment.yml"          
           resource-name: deployment/app
       
       - kubernetes/create-or-update-resource:
-          resource-file-path: "app-service.yml"
+          resource-file-path: "jack-app-service.yml"
       
       - run:
           name: information
