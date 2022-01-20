@@ -183,9 +183,9 @@ workflows:
       - create-eks-cluster:
           cluster-name: eks-cluster-jacklawrence
       - deploy-app-eks:
-          requires: [build-and-deploy-docker-image]
+          requires: [build/deploy-docker-image]
           cluster-name: eks-cluster-jacklawrence
           aws-region: eu-central-1
-          requires: [create-cluster]
+          requires: [create-eks-cluster]
       # - delete-eks-cluster:
       #     cluster-name: eks-cluster-jacklawrence
