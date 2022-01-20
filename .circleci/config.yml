@@ -94,7 +94,7 @@ jobs:
             $SUDO mv eksctl_download/eksctl /usr/local/bin/
             rmdir eksctl_download
             
-      - aws-eks/create-eks-cluster:
+      - aws-eks/create-cluster:
           cluster-name: eks-cluster-jacklawrence
           aws-region: eu-central-1
 
